@@ -1,33 +1,44 @@
-# To-Do App
+# To-Do App (Storage Edition)
 
-A modern, responsive To-Do application built with HTML, CSS, and JavaScript that fulfills all the specified user stories.
+A modern, responsive To-Do application built with HTML, CSS, and JavaScript that integrates with local storage and provides comprehensive task management features.
 
 ## Features
 
-### ✅ User Story 1: Two-Pane Layout
-- **Left Pane**: Displays a list of tasks with options to mark as completed or delete
-- **Right Pane**: Contains a task form for adding new tasks
+### ✅ User Story 1: Two-Pane Layout with Local Storage
+- **Left Pane**: Displays a list of tasks fetched from local storage
+- **Right Pane**: Contains a textarea for adding new tasks
 
-### ✅ User Story 2: Task Management
-- Add new tasks with title, description, and priority levels
-- Mark tasks as completed with visual feedback
-- Tasks automatically save to browser's local storage
+### ✅ User Story 2: ENTER Key Task Addition
+- Press ENTER in the textarea to add tasks to local storage and the left pane
+- Tasks immediately appear with completion and deletion options
+- Textarea clears automatically after adding a task
 
-### ✅ User Story 3: Task Deletion
+### ✅ User Story 3: Task Completion
+- Click checkbox to mark tasks as completed
+- Task status updates in local storage automatically
+- Visual feedback with strikethrough text and muted colors
+
+### ✅ User Story 4: Task Deletion
 - Delete tasks using the cross (×) icon
+- Tasks are removed from both the interface and local storage
 - Confirmation dialog prevents accidental deletions
-- Smooth animation effects for better user experience
+
+### ✅ User Story 5: Task Editing
+- Edit task names using the pencil (✏️) icon
+- Inline editing with Enter to save or Escape to cancel
+- Changes are automatically saved to local storage
 
 ## Additional Features
 
+- **Persistent Storage**: All tasks are automatically saved to local storage
 - **Responsive Design**: Works on desktop, tablet, and mobile devices
-- **Priority Levels**: High, Medium, and Low priority with color-coded indicators
-- **Local Storage**: Tasks persist between browser sessions
 - **Keyboard Shortcuts**:
-  - `Ctrl/Cmd + Enter`: Submit form
-  - `Escape`: Clear form
+  - `Enter`: Add new task (in textarea)
+  - `Enter`: Save task edit (during editing)
+  - `Escape`: Cancel task edit or clear textarea
 - **Visual Feedback**: Hover effects, animations, and completed task styling
 - **Empty State**: Helpful message when no tasks exist
+- **Inline Editing**: Click-to-edit functionality for task names
 
 ## Technologies Used
 
@@ -66,20 +77,25 @@ ToDoApp/
 ## Usage
 
 1. **Adding Tasks**:
-   - Fill in the task title (required)
-   - Add description (optional)
-   - Select priority level
-   - Click "Add Task" or press `Ctrl+Enter`
+   - Type your task in the textarea on the right pane
+   - Press `Enter` to add the task (Shift+Enter for new line in textarea)
+   - Task appears immediately in the left pane
 
 2. **Managing Tasks**:
    - Check the checkbox to mark tasks as completed
+   - Click the pencil (✏️) icon to edit task names
    - Click the × button to delete tasks
-   - Completed tasks show with strikethrough text and muted colors
+   - All changes automatically save to local storage
 
-3. **Data Persistence**:
-   - Tasks automatically save to your browser's local storage
+3. **Editing Tasks**:
+   - Click the pencil icon to enter edit mode
+   - Type your changes and press `Enter` to save
+   - Press `Escape` to cancel editing
+
+4. **Data Persistence**:
+   - All tasks automatically save to local storage
    - Data persists between browser sessions
-   - Clear browser data to reset all tasks
+   - Tasks load automatically when you return to the app
 
 ## Browser Compatibility
 

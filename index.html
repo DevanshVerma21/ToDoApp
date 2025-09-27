@@ -16,28 +16,13 @@
             </div>
         </div>
 
-        <!-- Right Pane - Task Form -->
+        <!-- Right Pane - Task Input -->
         <div class="right-pane">
             <h2>Add New Task</h2>
-            <form id="task-form" class="task-form">
-                <div class="form-group">
-                    <label for="task-title">Task Title:</label>
-                    <input type="text" id="task-title" name="task-title" required>
-                </div>
-                <div class="form-group">
-                    <label for="task-description">Description:</label>
-                    <textarea id="task-description" name="task-description" rows="4"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="task-priority">Priority:</label>
-                    <select id="task-priority" name="task-priority">
-                        <option value="low">Low</option>
-                        <option value="medium" selected>Medium</option>
-                        <option value="high">High</option>
-                    </select>
-                </div>
-                <button type="submit" class="submit-btn">Add Task</button>
-            </form>
+            <div class="task-input-container">
+                <textarea id="task-input" placeholder="Enter your task here and press ENTER to add..." rows="8"></textarea>
+                <p class="instruction-text">Press ENTER to add task</p>
+            </div>
         </div>
     </div>
 

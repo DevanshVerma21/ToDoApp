@@ -3,61 +3,59 @@ let tasks = [];
 let taskIdCounter = 1;
 
 // DOM elements
-const taskForm = document.getElementById('task-form');
+const taskInput = document.getElementById('task-input');
 const taskList = document.getElementById('task-list');
-const taskTitleInput = document.getElementById('task-title');
-const taskDescriptionInput = document.getElementById('task-description');
-const taskPrioritySelect = document.getElementById('task-priority');
 
 // Initialize the app
 document.addEventListener('DOMContentLoaded', function() {
-    // Load tasks from localStorage if available
+    // Load tasks from localStorage (User Story 1)
     loadTasksFromStorage();
     
     // Render initial tasks
     renderTasks();
     
-    // Add event listener for form submission
-    taskForm.addEventListener('submit', handleFormSubmit);
+    // Add event listener for ENTER key in textarea (User Story 2)
+    taskInput.addEventListener('keydown', handleTextareaEnter);
+    
+    // Focus on textarea
+    taskInput.focus();
 });
 
-// Handle form submission (User Story 2)
-function handleFormSubmit(e) {
-    e.preventDefault();
-    
-    const title = taskTitleInput.value.trim();
-    const description = taskDescriptionInput.value.trim();
-    const priority = taskPrioritySelect.value;
-    
-    if (!title) {
-        alert('Please enter a task title');
-        return;
+// Handle ENTER key press in textarea (User Story 2)
+function handleTextareaEnter(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        
+        const taskText = taskInput.value.trim();
+        
+        if (!taskText) {
+            alert('Please enter a task');
+            return;
+        }
+        
+        // Create new task object
+        const newTask = {
+            id: taskIdCounter++,
+            text: taskText,
+            completed: false,
+            createdAt: new Date().toISOString()
+        };
+        
+        // Add task to the beginning of the array
+        tasks.unshift(newTask);
+        
+        // Save to localStorage
+        saveTasksToStorage();
+        
+        // Re-render tasks
+        renderTasks();
+        
+        // Clear textarea
+        taskInput.value = '';
+        
+        // Keep focus on textarea
+        taskInput.focus();
     }
-    
-    // Create new task object
-    const newTask = {
-        id: taskIdCounter++,
-        title: title,
-        description: description,
-        priority: priority,
-        completed: false,
-        createdAt: new Date().toISOString()
-    };
-    
-    // Add task to the beginning of the array
-    tasks.unshift(newTask);
-    
-    // Save to localStorage
-    saveTasksToStorage();
-    
-    // Re-render tasks
-    renderTasks();
-    
-    // Reset form
-    taskForm.reset();
-    
-    // Focus back to title input
-    taskTitleInput.focus();
 }
 
 // Render all tasks in the left pane
@@ -91,7 +89,7 @@ function renderEmptyState() {
 // Create individual task element
 function createTaskElement(task) {
     const taskDiv = document.createElement('div');
-    taskDiv.className = `task-item ${task.priority}-priority ${task.completed ? 'completed' : ''}`;
+    taskDiv.className = `task-item ${task.completed ? 'completed' : ''}`;
     taskDiv.dataset.taskId = task.id;
     
     taskDiv.innerHTML = `
@@ -99,26 +97,28 @@ function createTaskElement(task) {
             <div style="display: flex; align-items: center; flex: 1;">
                 <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} 
                        onchange="toggleTaskCompletion(${task.id})">
-                <h3 class="task-title">${escapeHtml(task.title)}</h3>
+                <h3 class="task-title" id="task-title-${task.id}">${escapeHtml(task.text)}</h3>
             </div>
             <div class="task-actions">
+                <button class="edit-btn" onclick="editTask(${task.id})" title="Edit task">
+                    ✏️
+                </button>
                 <button class="delete-btn" onclick="deleteTask(${task.id})" title="Delete task">
                     ×
                 </button>
             </div>
         </div>
-        ${task.description ? `<p class="task-description">${escapeHtml(task.description)}</p>` : ''}
-        <span class="task-priority-badge priority-${task.priority}">${task.priority}</span>
     `;
     
     return taskDiv;
 }
 
-// Toggle task completion (User Story 2 - Mark as completed)
+// Toggle task completion (User Story 3)
 function toggleTaskCompletion(taskId) {
     const task = tasks.find(t => t.id === taskId);
     if (task) {
         task.completed = !task.completed;
+        // Save updated status to localStorage
         saveTasksToStorage();
         renderTasks();
         
@@ -133,11 +133,10 @@ function toggleTaskCompletion(taskId) {
     }
 }
 
-// Delete task (User Story 3)
+// Delete task (User Story 4)
 function deleteTask(taskId) {
-    // Add confirmation dialog
     const task = tasks.find(t => t.id === taskId);
-    if (task && confirm(`Are you sure you want to delete "${task.title}"?`)) {
+    if (task && confirm(`Are you sure you want to delete "${task.text}"?`)) {
         // Remove task from array
         tasks = tasks.filter(t => t.id !== taskId);
         
@@ -157,6 +156,61 @@ function deleteTask(taskId) {
             renderTasks();
         }
     }
+}
+
+// Edit task (User Story 5)
+function editTask(taskId) {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+    
+    const titleElement = document.getElementById(`task-title-${taskId}`);
+    const currentText = task.text;
+    
+    // Create input element for editing
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = currentText;
+    input.className = 'task-title editing';
+    
+    // Replace title with input
+    titleElement.style.display = 'none';
+    titleElement.parentNode.insertBefore(input, titleElement.nextSibling);
+    
+    // Focus and select all text
+    input.focus();
+    input.select();
+    
+    // Handle save on Enter or blur
+    function saveEdit() {
+        const newText = input.value.trim();
+        if (newText && newText !== currentText) {
+            task.text = newText;
+            saveTasksToStorage();
+            renderTasks();
+        } else {
+            // Restore original title
+            titleElement.style.display = 'block';
+            input.remove();
+        }
+    }
+    
+    // Handle cancel on Escape
+    function cancelEdit() {
+        titleElement.style.display = 'block';
+        input.remove();
+    }
+    
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            saveEdit();
+        } else if (e.key === 'Escape') {
+            e.preventDefault();
+            cancelEdit();
+        }
+    });
+    
+    input.addEventListener('blur', saveEdit);
 }
 
 // Utility function to escape HTML to prevent XSS
@@ -219,13 +273,11 @@ function getTaskStatistics() {
     const total = tasks.length;
     const completed = tasks.filter(t => t.completed).length;
     const pending = total - completed;
-    const highPriority = tasks.filter(t => t.priority === 'high' && !t.completed).length;
     
     return {
         total,
         completed,
-        pending,
-        highPriority
+        pending
     };
 }
 
@@ -245,25 +297,15 @@ function exportTasks() {
 
 // Keyboard shortcuts
 document.addEventListener('keydown', function(e) {
-    // Ctrl/Cmd + Enter to submit form
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-        if (document.activeElement === taskTitleInput || 
-            document.activeElement === taskDescriptionInput) {
-            handleFormSubmit(e);
-        }
-    }
-    
-    // Escape to clear form
+    // Escape to clear textarea
     if (e.key === 'Escape') {
-        if (document.activeElement === taskTitleInput || 
-            document.activeElement === taskDescriptionInput) {
-            taskForm.reset();
-            taskTitleInput.focus();
+        if (document.activeElement === taskInput) {
+            taskInput.value = '';
         }
     }
 });
 
-// Auto-focus on title input when page loads
+// Auto-focus on textarea when page loads
 window.addEventListener('load', function() {
-    taskTitleInput.focus();
+    taskInput.focus();
 });
